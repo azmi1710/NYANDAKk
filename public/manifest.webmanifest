@@ -1,0 +1,14 @@
+{
+  "name": "NYANDAK — Beliin, antarin, beres.",
+  "short_name": "NYANDAK",
+  "description": "Jasa suruh warga Sirampog & sekitarnya. Kurir orang sekitar, bayar cash.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FDF6EC",
+  "theme_color": "#C75B2B",
+  "lang": "id",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

@@ -1,0 +1,167 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-pjs);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-pressed: var(--pressed);
+  --color-turmeric: var(--turmeric);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 1.25rem;
+  /* NYANDAK · Lokal Energik — terakota, krem hangat, kunyit */
+  --background: #fdf6ec;
+  --foreground: #33241c;
+  --card: #ffffff;
+  --card-foreground: #33241c;
+  --popover: #ffffff;
+  --popover-foreground: #33241c;
+  --primary: #c75b2b;
+  --primary-foreground: #fff7ef;
+  --secondary: #f2a93b;
+  --secondary-foreground: #4a2e0f;
+  --muted: #f5ebdd;
+  --muted-foreground: #8a7a70;
+  --accent: #f9e8d8;
+  --accent-foreground: #8f3e1e;
+  --destructive: #b3402f;
+  --success: #3e7c4f;
+  --success-foreground: #f0f9f1;
+  --pressed: #8f3e1e;
+  --turmeric: #f2a93b;
+  --border: #eaddcc;
+  --input: #eaddcc;
+  --ring: #c75b2b;
+  --chart-1: #c75b2b;
+  --chart-2: #f2a93b;
+  --chart-3: #3e7c4f;
+  --chart-4: #8f3e1e;
+  --chart-5: #8a7a70;
+  --sidebar: #33241c;
+  --sidebar-foreground: #f5ebdd;
+  --sidebar-primary: #c75b2b;
+  --sidebar-primary-foreground: #fff7ef;
+  --sidebar-accent: #4a352a;
+  --sidebar-accent-foreground: #f9e8d8;
+  --sidebar-border: #4a352a;
+  --sidebar-ring: #c75b2b;
+}
+
+.dark {
+  --background: #241a14;
+  --foreground: #f5ebdd;
+  --card: #2f231a;
+  --card-foreground: #f5ebdd;
+  --popover: #2f231a;
+  --popover-foreground: #f5ebdd;
+  --primary: #d9703f;
+  --primary-foreground: #fff7ef;
+  --secondary: #f2a93b;
+  --secondary-foreground: #4a2e0f;
+  --muted: #3a2c20;
+  --muted-foreground: #b3a294;
+  --accent: #3a2c20;
+  --accent-foreground: #f9e8d8;
+  --destructive: #d9703f;
+  --border: #4a352a;
+  --input: #4a352a;
+  --ring: #d9703f;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-pjs), ui-sans-serif, system-ui, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* ── NYANDAK komponen kecil ── */
+@layer components {
+  .zone-badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold;
+  }
+  .zone-a {
+    background: #f5d9c8;
+    color: #8f3e1e;
+  }
+  .zone-b {
+    background: #fce8c4;
+    color: #7a4d0d;
+  }
+  .zone-c {
+    background: #ddeedf;
+    color: #2c5e3a;
+  }
+
+  .ny-card {
+    @apply rounded-[20px] shadow-[0_1px_3px_rgba(51,36,28,0.08)];
+  }
+}
+
+.dotline {
+  background-image: radial-gradient(circle, #c75b2b 2px, transparent 2.5px);
+  background-size: 14px 2px;
+  background-repeat: repeat-x;
+  background-position: center;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #e0d2bf;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* safe area buat bottom nav di HP */
+.pb-safe {
+  padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px));
+}

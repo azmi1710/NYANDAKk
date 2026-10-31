@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(cuid())
+  role          String // CUSTOMER | KURIR | ADMIN
+  name          String
+  phone         String         @unique
+  passwordHash  String
+  village       String?
+  address       String?
+  status        String         @default("ACTIVE") // ACTIVE | PENDING | SUSPENDED | BLOCKED
+  online        Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  sessions      Session[]
+  customerOrder Order[]        @relation("CustomerOrders")
+  kurirOrder    Order[]        @relation("KurirOrders")
+  messages      Message[]
+  ledger        LedgerEntry[]
+  notifications Notification[]
+  logs          ActivityLog[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model Setting {
+  key   String @id
+  value String
+}
+
+model Order {
+  id           String       @id @default(cuid())
+  code         String       @unique
+  type         String // BELIIN | ANTAR | TITIP | LAINNYA
+  status       String       @default("MENUNGGU_KURIR") // MENUNGGU_KURIR | DIPROSES | DIANTAR | SELESAI | DIBATALKAN
+  statusDetail String? // QUEUED_OFFHOURS | MENUNGGU_STRUK
+  customerId   String
+  customer     User         @relation("CustomerOrders", fields: [customerId], references: [id])
+  kurirId      String?
+  kurir        User?        @relation("KurirOrders", fields: [kurirId], references: [id])
+  villageFrom  String
+  villageTo    String
+  zone         String // A | B | C
+  items        String
+  budget       Int?
+  note         String?
+  fare         Int
+  fee          Int
+  strukStatus  String? // PENDING | APPROVED | REJECTED
+  strukNote    String?
+  cancelReason String?
+  penalty      Int          @default(0)
+  dispute      Boolean      @default(false)
+  disputeNote  String?
+  broadcastAt  DateTime     @default(now())
+  acceptedAt   DateTime?
+  completedAt  DateTime?
+  createdAt    DateTime     @default(now())
+  photos       OrderPhoto[]
+  messages     Message[]
+  ledger       LedgerEntry[]
+}
+
+model OrderPhoto {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  uploaderId String
+  url       String
+  kind      String // STRUK | BARANG | PICKUP | BUKTI | KOMPLAIN
+  createdAt DateTime @default(now())
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  senderId  String
+  sender    User     @relation(fields: [senderId], references: [id])
+  text      String
+  createdAt DateTime @default(now())
+}
+
+model LedgerEntry {
+  id        String    @id @default(cuid())
+  kurirId   String
+  kurir     User      @relation(fields: [kurirId], references: [id])
+  orderId   String?
+  order     Order?    @relation(fields: [orderId], references: [id])
+  type      String // FEE | SETOR
+  amount    Int // FEE: hutang kurir (+) ; SETOR: pembayaran (-)
+  settled   Boolean   @default(false)
+  createdAt DateTime  @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  orderId   String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  actor     User?    @relation(fields: [actorId], references: [id])
+  action    String
+  detail    String?
+  createdAt DateTime @default(now())
+}
