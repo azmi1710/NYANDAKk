@@ -50,5 +50,8 @@ test
 prompt
 
 server.log
+
+# database lokal (jangan di-upload: berisi data & password hash)
+/db/
 # Skills directory
 /skills/

@@ -3,6 +3,18 @@ const { spawn } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 
+// ── muat .env (nilai .env menang atas env shell basi) ──
+function loadDotenv() {
+  try {
+    const envFile = fs.readFileSync(path.join(process.cwd(), ".env"), "utf8");
+    for (const line of envFile.split("\n")) {
+      const m = /^\s*([A-Z_][A-Z0-9_]*)\s*=\s*(.*)\s*$/.exec(line);
+      if (m && m[2].length) process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
+    }
+  } catch {}
+}
+loadDotenv();
+
 process.env.NODE_ENV = "production";
 
 const logFile = path.join(process.cwd(), "server.log");

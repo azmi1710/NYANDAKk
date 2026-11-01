@@ -1,21 +1,37 @@
-// Kirim event realtime ke socket mini-service (port 3030).
+// Kirim event realtime via Supabase Realtime Broadcast.
+// Pengganti socket mini-service — jalan di mana saja termasuk serverless (Vercel).
 // Gagal emit tidak boleh merusak request utama — best effort saja.
-const SOCKET_URL = "http://127.0.0.1:3030/emit";
-const KEY = "nyandak-internal-1";
+import { supaServer } from "./supabase-server";
+
+const CHANNEL = "nyandak";
+const globalForEmit = globalThis as unknown as {
+  nyandakChannelReady: Promise<unknown> | undefined;
+};
 
 export type EmitPayload = { rooms: string[]; event: string; data: unknown };
 
 export async function emit(rooms: string[], event: string, data: unknown): Promise<void> {
+  const supa = supaServer();
+  if (!supa) return; // env belum lengkap — lewati, UI tetap segar lewat polling
+
   try {
-    const body: EmitPayload = { rooms, event, data };
-    await fetch(SOCKET_URL, {
-      method: "POST",
-      headers: { "content-type": "application/json", "x-nyandak-key": KEY },
-      body: JSON.stringify(body),
-      signal: AbortSignal.timeout(1500),
+    // siapkan channel sekali per instance (serverless hangat = cepat)
+    if (!globalForEmit.nyandakChannelReady) {
+      const ch = supa.channel(CHANNEL);
+      globalForEmit.nyandakChannelReady = ch.subscribe();
+    }
+    await Promise.race([
+      globalForEmit.nyandakChannelReady,
+      new Promise((r) => setTimeout(r, 1000)),
+    ]);
+
+    await supa.channel(CHANNEL).send({
+      type: "broadcast",
+      event,
+      payload: { rooms, d: data },
     });
   } catch {
-    // socket service mungkin belum jalan — abaikan
+    // realtime gagal — abaikan, polling tetap jalan
   }
 }
 

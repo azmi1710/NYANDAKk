@@ -1,14 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
 import { db } from "@/lib/db";
 import { cookieName, getSessionUser } from "@/lib/auth";
 import { notify } from "@/lib/notify";
 import { emit, rooms } from "@/lib/emit";
+import { supaServer } from "@/lib/supabase-server";
 
 const MAX_BASE64 = 2_500_000; // ~1.9 MB foto
 const KINDS = ["STRUK", "BARANG", "PICKUP", "BUKTI", "KOMPLAIN"];
+const BUCKET = "nyandak-foto";
+const g = globalThis as unknown as { bucketReady?: boolean };
+
+// pastikan bucket publik ada (dibuat otomatis sekali per instance)
+async function ensureBucket() {
+  if (g.bucketReady) return;
+  const supa = supaServer();
+  if (!supa) throw new Error("Supabase belum disetel.");
+  const { data: buckets } = await supa.storage.listBuckets();
+  if (!buckets?.some((b) => b.name === BUCKET)) {
+    const { error } = await supa.storage.createBucket(BUCKET, { public: true });
+    if (error && !error.message.includes("exists")) throw new Error(error.message);
+  }
+  g.bucketReady = true;
+}
 
 export async function POST(req: NextRequest) {
   const user = await getSessionUser((await cookies()).get(cookieName())?.value);
@@ -38,11 +52,21 @@ export async function POST(req: NextRequest) {
   const ext = m[1] === "jpeg" ? "jpg" : m[1];
   const buf = Buffer.from(m[2], "base64");
 
-  const dir = path.join(process.cwd(), "public", "uploads");
-  await mkdir(dir, { recursive: true });
+  // simpan ke Supabase Storage (bucket publik, dibuat otomatis)
+  try {
+    await ensureBucket();
+  } catch (e) {
+    return NextResponse.json({ error: `Storage gagal: ${(e as Error).message}` }, { status: 500 });
+  }
+  const supa = supaServer()!;
   const filename = `${orderId}-${kind.toLowerCase()}-${Date.now()}.${ext}`;
-  await writeFile(path.join(dir, filename), buf);
-  const url = `/uploads/${filename}`;
+  const { error: upErr } = await supa.storage.from(BUCKET).upload(filename, buf, {
+    contentType: `image/${m[1]}`,
+    upsert: false,
+  });
+  if (upErr) return NextResponse.json({ error: `Gagal simpan foto: ${upErr.message}` }, { status: 500 });
+  const { data: pub } = supa.storage.from(BUCKET).getPublicUrl(filename);
+  const url = pub.publicUrl;
 
   const photo = await db.orderPhoto.create({
     data: { orderId, uploaderId: user.id, url, kind },

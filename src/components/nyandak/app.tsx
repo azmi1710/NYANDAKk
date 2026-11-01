@@ -13,7 +13,22 @@ import { OrderList } from "./order-card";
 import { BottomNav, TopBar, useRealtimeBadge, type TabDef } from "./shell";
 import { EmptyState } from "./brand";
 import { api, usePolling } from "./client";
+import { ALL_VILLAGES, ZONE_A, ZONE_B, ZONE_C } from "@/lib/nyandak";
 import type { BoardItem, LedgerEntryDTO, Me, OrderDTO, PublicInfo } from "./types";
+
+// Cadangan kalau /api/public gagal sesaat — biar user tetap bisa masuk & pakai app
+const FALLBACK_INFO: PublicInfo = {
+  fares: { A: 5000, B: 8000, C: 15000 },
+  openHour: 6,
+  closeHour: 20,
+  openNow: false,
+  codLimit: 300000,
+  announcement: "",
+  kurirOnline: 0,
+  orderCount: 0,
+  zones: { A: ZONE_A, B: ZONE_B, C: ZONE_C },
+  villages: ALL_VILLAGES,
+};
 
 const NAV: Record<string, TabDef[]> = {
   CUSTOMER: [
@@ -123,10 +138,11 @@ export default function NyandakApp() {
     );
   }
 
-  if (!me || !info) {
+  if (!me) {
     return <AuthView onLoggedIn={onLoggedIn} />;
   }
 
+  const infoData = info ?? FALLBACK_INFO;
   const nav = NAV[me.role];
   const openOrder = (id: string) => setView({ kind: "order", id });
   const closeOverlay = () => setView({ kind: "none" });
@@ -138,7 +154,7 @@ export default function NyandakApp() {
         <TopBar me={me} unread={unread} onRead={() => setUnread(0)} onTapOrder={openOrder} />
         <main className="max-w-lg mx-auto px-4 py-4 pb-24">
           <h1 className="text-lg font-extrabold mb-3">🛵 Bikin Order</h1>
-          <OrderForm info={info} me={me} onCancel={closeOverlay} onCreated={(id) => setView({ kind: "order", id })} />
+          <OrderForm info={infoData} me={me} onCancel={closeOverlay} onCreated={(id) => setView({ kind: "order", id })} />
         </main>
       </div>
     );
@@ -153,7 +169,7 @@ export default function NyandakApp() {
     if (!order) {
       // admin buka dari datanya sendiri via AdminOrderOverlay
       return me.role === "ADMIN" ? (
-        <AdminOrderScreen id={view.id} me={me} villages={info.villages} unread={unread} setUnread={setUnread} onBack={closeOverlay} onChanged={() => {}} />
+        <AdminOrderScreen id={view.id} me={me} villages={infoData.villages} unread={unread} setUnread={setUnread} onBack={closeOverlay} onChanged={() => {}} />
       ) : (
         <div className="min-h-dvh bg-background">
           <TopBar me={me} unread={unread} onRead={() => setUnread(0)} onTapOrder={openOrder} />
@@ -169,7 +185,7 @@ export default function NyandakApp() {
         <TopBar me={me} unread={unread} onRead={() => setUnread(0)} onTapOrder={openOrder} />
         <main className="max-w-lg mx-auto px-4 py-4 pb-24">
           <Button variant="ghost" className="h-9 rounded-full px-3 mb-2 -ml-2" onClick={closeOverlay}>← Kembali</Button>
-          <OrderDetail order={order} me={me} villages={info.villages} onChanged={loadRoleData} />
+          <OrderDetail order={order} me={me} villages={infoData.villages} onChanged={loadRoleData} />
         </main>
       </div>
     );
@@ -182,7 +198,7 @@ export default function NyandakApp() {
       content = (
         <CustomerHome
           me={me}
-          info={info}
+          info={infoData}
           orders={orders}
           onNewOrder={(type) => setView({ kind: "form", type })}
           onTapOrder={openOrder}
@@ -196,7 +212,7 @@ export default function NyandakApp() {
         </div>
       );
     } else {
-      content = <ProfileView me={me} villages={info.villages} onMeChange={setMe} />;
+      content = <ProfileView me={me} villages={infoData.villages} onMeChange={setMe} />;
     }
   } else if (me.role === "KURIR") {
     const todayFare = kurirData.mine
@@ -241,7 +257,7 @@ export default function NyandakApp() {
     } else if (tab === "tabungan") {
       content = <KurirTabungan entries={kurirData.ledger} />;
     } else {
-      content = <ProfileView me={me} villages={info.villages} onMeChange={setMe} />;
+      content = <ProfileView me={me} villages={infoData.villages} onMeChange={setMe} />;
     }
   } else {
     content = <AdminView me={me} refreshSignal={signal} onTapOrder={(id) => setView({ kind: "order", id })} tabKey={tab} onTabKey={setTab} />;

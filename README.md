@@ -1,7 +1,7 @@
 # NYANDAK 🦆 — Beliin, antarin, beres.
 
 Platform jasa suruh (Beliin / Antar / Titip) untuk wilayah Kecamatan Sirampog, Brebes.
-Dibangun dengan **Next.js 16 + TypeScript + Tailwind + Prisma (SQLite) + Socket.IO**.
+Dibangun dengan **Next.js 16 + TypeScript + Tailwind + Prisma (PostgreSQL/Supabase) + Supabase Realtime & Storage**.
 
 ## Fitur
 
@@ -9,33 +9,36 @@ Dibangun dengan **Next.js 16 + TypeScript + Tailwind + Prisma (SQLite) + Socket.
 - **Order**: BELIIN (belanjakan + foto struk), ANTAR, TITIP, LAINNYA
 - **Zona otomatis**: A (Mendala, Buniwah, Kaligiri, Manggis) Rp5.000 · B (9 desa Sirampog) Rp8.000 · C (Tonjong, Paguyangan, Bumiayu, Bumijawa) Rp15.000
 - **Fee admin 20%** tercatat otomatis ke tabungan kurir (setoran Minggu / di atas Rp50.000)
-- **Chat realtime** per order (Socket.IO), notifikasi in-app + Web Push
+- **Chat realtime** per order (Supabase Realtime), notifikasi in-app
 - **State machine**: MENUNGGU_KURIR → DIPROSES → DIANTAR → SELESAI / DIBATALKAN
-- **Otomatisasi**: order luar jam buka masuk antrean (buka 06.00–20.00 WIB), broadcast 15 menit tak diambil → lelang ulang, COD maks Rp300.000, denda batal Rp5.000, 12 jam tanpa konfirmasi → auto selesai
+- **Otomatisasi**: order luar jam buka masuk antrean (buka 06.00–20.00 WIB), broadcast 15 menit tak diambil → lelang ulang, COD maks Rp300.000, denda batal Rp5.000, 12 jam tanpa konfirmasi → auto selesai (sweep jalan otomatis tiap ada aktivitas API)
 - **PWA**: bisa "Add to Home Screen" di HP, tampil seperti aplikasi native
+
+## Siapkan Supabase (sekali saja, gratis)
+
+1. Buka [supabase.com](https://supabase.com) → **Start your project** → sign in pakai GitHub
+2. **New project** → Name: `nyandak`, region **Singapore**, buat database password (CATAT!)
+3. Setelah jadi, ambil 5 nilai ini:
+   - Tombol **Connect** → **Transaction pooler** → `DATABASE_URL` (tambahkan `?pgbouncer=true&connection_limit=1` di belakangnya bila belum ada)
+   - Tombol **Connect** → **Session pooler** → `DIRECT_URL`
+   - **Project Settings → API** → Project URL → `NEXT_PUBLIC_SUPABASE_URL`
+   - **Project Settings → API** → `anon public` → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - **Project Settings → API** → `service_role` → `SUPABASE_SERVICE_ROLE_KEY` (rahasia!)
 
 ## Jalanin Lokal (Windows / Mac / Linux — pakai npm)
 
 ```bash
-npm install              # 1. pasang dependensi
-cp .env.example .env     #    Windows PowerShell: Copy-Item .env.example .env
-npm run db:push          # 2. buat database SQLite
-npm run db:seed          # 3. isi data demo (opsional tapi disarankan)
-npm run dev              # 4. buka http://localhost:3000
+npm install                    # 1. pasang dependensi
+cp .env.example .env           #    Windows: Copy-Item .env.example .env
+# 2. isi .env dengan 5 nilai dari Supabase (lihat di atas)
+npm run db:push                # 3. buat semua tabel di Supabase
+npm run db:seed                # 4. isi data demo (opsional tapi disarankan)
+npm run dev                    # 5. buka http://localhost:3000
 ```
 
-> `npm run db:push` butuh file `.env` — kalau error "Environment variable not found:
-> DATABASE_URL", berarti `.env` belum dibuat. Kalau error "unable to open database
-> file", buat foldernya dulu: `mkdir db`.
-
-Jalankan juga **socket service** di terminal kedua (buat chat & notif realtime):
-
-```bash
-npx tsx mini-services/nyandak-socket/index.ts
-```
-
-Tanpa socket service aplikasi tetap jalan (data tetap segar lewat polling),
-tapi chat realtime baru aktif kalau service ini ikut dijalankan.
+> Error "Environment variable not found: DATABASE_URL" = `.env` belum dibuat / belum diisi.
+> Local dan online pakai database Supabase yang sama — data demo yang di-seed langsung
+> terlihat juga di versi online.
 
 ### Akun demo (dari seed)
 
@@ -47,37 +50,31 @@ tapi chat realtime baru aktif kalau service ini ikut dijalankan.
 
 > Reset data demo kapan saja: `npm run db:seed` (⚠️ menghapus semua data order/user).
 
-## Deploy Online (ringkas)
+## Deploy ke Vercel (klik-klik doang)
 
-Aplikasi ini pakai **SQLite (file)** + **Socket.IO**, jadi cara paling pas adalah VPS
-(persisten & support websocket) — misal Oracle Cloud Free Tier atau VPS murah lainnya:
+1. Push project ke GitHub (lihat bagian sebelumnya / GitHub Desktop)
+2. Buka [vercel.com](https://vercel.com) → **Sign up with GitHub** → **Add New… → Project** → pilih repo `nyandak` → **Import**
+3. Sebelum klik Deploy, buka **Environment Variables**, isi 5 variabel berikut (nilainya sama seperti di `.env` kamu):
 
-```bash
-# di VPS (Ubuntu):
-git clone <repo> && cd nyandak
-npm install
-cp .env.example .env && npm run db:push && npm run db:seed
-npm run build
-npm run start          # port 3000 → arahkan Nginx/Caddy + domain ke port ini
-```
+   | Nama                          | Isi                                   |
+   | ----------------------------- | ------------------------------------- |
+   | `DATABASE_URL`                | Transaction pooler (port 6543)        |
+   | `DIRECT_URL`                  | Session pooler (port 5432)            |
+   | `NEXT_PUBLIC_SUPABASE_URL`    | URL project Supabase                  |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | anon public key                     |
+   | `SUPABASE_SERVICE_ROLE_KEY`   | service_role key (rahasia)            |
 
-> Di VPS, jalankan juga socket service (`npx tsx mini-services/nyandak-socket/index.ts`,
-> misalnya lewat `pm2`) dan kosongkan `NEXT_PUBLIC_SOCKET_URL` di `.env` bila pakai
-> Nginx/Caddy yang meneruskan `/?XTransformPort=3030` ke `127.0.0.1:3030`.
-
-Alternatif tanpa VPS (Railway / Render berbayar-free-tier): tetap sama, tapi pastikan
-disknya persisten karena data ada di file `db/custom.db`. Host serverless murni
-(Vercel/Netlify functions) **tidak cocok** untuk SQLite file — datanya hilang karena
-filesystem efemeral. Kalau nanti mau ke Vercel/Netlify, database perlu dipindah ke
-Turso/Supabase (bisa jadi langkah v2).
+4. Klik **Deploy** → tunggu ±2 menit → dapat link `nyandak-xxx.vercel.app` 🎉
+5. Tiap kali kamu push ke GitHub sesudah ini, Vercel **otomatis** update websitenya.
 
 ## Struktur Penting
 
 ```
 prisma/schema.prisma        Skema DB (User, Order, Message, LedgerEntry, dst.)
 src/lib/nyandak.ts          Aturan bisnis: zona, tarif, fee, jam buka
+src/lib/emit.ts             Broadcast realtime (Supabase)
+src/lib/supabase-server.ts  Client Supabase sisi server (storage & realtime)
 src/app/api/                REST API (auth, orders, chat, admin, upload, ...)
 src/components/nyandak/     UI Customer / Kurir / Admin + chat + shell PWA
-mini-services/nyandak-socket  Socket.IO server (chat & notif realtime)
 scripts/seed.ts             Data demo
 ```

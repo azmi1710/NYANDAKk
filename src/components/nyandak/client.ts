@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
-import { io, type Socket } from "socket.io-client";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { createClient, type SupabaseClient, type RealtimeChannel } from "@supabase/supabase-js";
 
 // ── fetch helper ──
 export async function api<T = unknown>(path: string, body?: unknown, method?: string): Promise<T> {
@@ -16,35 +16,68 @@ export async function api<T = unknown>(path: string, body?: unknown, method?: st
   return data as T;
 }
 
-// ── socket realtime ──
-// Lokal (PC sendiri): set NEXT_PUBLIC_SOCKET_URL=http://localhost:3030 di .env
-// Sandbox/gateway  : biarkan kosong → pakai path gateway bawaan
-const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "/?XTransformPort=3030";
+// ── supabase browser client ──
+let supaBrowser: SupabaseClient | null = null;
+function supaClient(): SupabaseClient | null {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) return null;
+  if (!supaBrowser) {
+    supaBrowser = createClient(url, key, { auth: { persistSession: false } });
+  }
+  return supaBrowser;
+}
 
+// ── realtime: Supabase Broadcast, interface sama seperti socket.io (.on/.off) ──
+type Listener = (data: unknown) => void;
+const REG = new Map<string, Set<Listener>>();
+const WRAP = new WeakMap<Listener, Listener>();
+let chan: RealtimeChannel | null = null;
+
+function ensureChannel(): boolean {
+  const supa = supaClient();
+  if (!supa) return false;
+  if (!chan) {
+    chan = supa.channel("nyandak");
+    chan.on("broadcast", { event: "*" }, ({ event, payload }) => {
+      const set = REG.get(event);
+      if (!set || set.size === 0) return;
+      for (const l of set) l(payload);
+    });
+    chan.subscribe();
+  }
+  return true;
+}
+
+// ── socket realtime (nama & perilaku dipertahankan dari versi lama) ──
 export function useSocket(userId: string | undefined, role: string | undefined, orderId?: string | null) {
-  const [socket, setSocket] = useState<Socket | null>(null);
-  const soRef = useRef<Socket | null>(null);
-
-  useEffect(() => {
-    if (!userId) return;
-    const so = io(SOCKET_URL, { path: "/", reconnectionDelayMax: 10000 });
-    soRef.current = so;
-    setSocket(so);
-    so.emit("subscribe", { userId, role, orderId: orderId ?? undefined });
-    return () => {
-      so.disconnect();
-      soRef.current = null;
-      setSocket(null);
+  return useMemo(() => {
+    const uid = userId;
+    const rl = role;
+    const oid = orderId ?? undefined;
+    return {
+      on(event: string, cb: Listener) {
+        if (!ensureChannel()) return;
+        const wrapped: Listener = (payload) => {
+          const rooms: string[] = Array.isArray(payload?.rooms) ? payload.rooms : [];
+          const ok = rooms.some(
+            (r) =>
+              (uid && r === `user:${uid}`) ||
+              (rl && r === `role:${rl}`) ||
+              (oid && r === `order:${oid}`)
+          );
+          if (ok) cb(payload?.d);
+        };
+        WRAP.set(cb, wrapped);
+        if (!REG.has(event)) REG.set(event, new Set());
+        REG.get(event)!.add(wrapped);
+      },
+      off(event: string, cb: Listener) {
+        const wrapped = WRAP.get(cb);
+        if (wrapped) REG.get(event)?.delete(wrapped);
+      },
     };
-     
-  }, [userId, role]);
-
-  useEffect(() => {
-    if (soRef.current && orderId) soRef.current.emit("subscribe", { userId, role, orderId });
-     
-  }, [orderId]);
-
-  return socket;
+  }, [userId, role, orderId]);
 }
 
 // ── polling ringan ──
@@ -62,7 +95,7 @@ export function usePolling(fn: () => void | Promise<void>, ms: number, deps: unk
       alive = false;
       clearInterval(t);
     };
-     
+
   }, deps);
 }
 

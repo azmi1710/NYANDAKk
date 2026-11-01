@@ -16,7 +16,6 @@ const S = {
 };
 
 async function main() {
-  await db.$queryRawUnsafe("PRAGMA journal_mode=WAL;");
   for (const [key, value] of Object.entries(S)) {
     await db.setting.upsert({ where: { key }, update: { value }, create: { key, value } });
   }
