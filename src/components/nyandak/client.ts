@@ -5,14 +5,22 @@ import { createClient, type SupabaseClient, type RealtimeChannel } from "@supaba
 
 // ── fetch helper ──
 export async function api<T = unknown>(path: string, body?: unknown, method?: string): Promise<T> {
-  const res = await fetch(path, {
-    method: method ?? (body ? "POST" : "GET"),
-    headers: body ? { "content-type": "application/json" } : undefined,
-    body: body ? JSON.stringify(body) : undefined,
-    cache: "no-store",
-  });
+  let res: Response;
+  try {
+    res = await fetch(path, {
+      method: method ?? (body ? "POST" : "GET"),
+      headers: body ? { "content-type": "application/json" } : undefined,
+      body: body ? JSON.stringify(body) : undefined,
+      cache: "no-store",
+    });
+  } catch {
+    throw new Error("Gak bisa nyambung ke server. Cek internet kamu, lalu coba lagi.");
+  }
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error((data as { error?: string }).error || "Ada yang error, coba lagi.");
+  if (!res.ok)
+    throw new Error(
+      (data as { error?: string }).error || `Ada yang error (kode ${res.status}), coba lagi.`
+    );
   return data as T;
 }
 

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,7 +21,6 @@ export default function ProfileView({
   villages: string[];
   onMeChange: (me: Me) => void;
 }) {
-  const router = useRouter();
   const [me, setMe] = useState(initial);
   const [editOpen, setEditOpen] = useState(false);
   const [pwOpen, setPwOpen] = useState(false);
@@ -57,9 +55,13 @@ export default function ProfileView({
   }
 
   async function logout() {
-    await api("/api/auth", { action: "logout" });
-    router.refresh();
-    window.location.reload();
+    try {
+      await api("/api/auth", { action: "logout" });
+      window.location.href = "/";
+    } catch (err) {
+      // logout server gagal (misal koneksi putus) — tampilin pesan, jangan crash
+      toast.error((err as Error).message);
+    }
   }
 
   return (

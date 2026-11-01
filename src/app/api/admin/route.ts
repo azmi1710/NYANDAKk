@@ -5,7 +5,7 @@ import { cookieName, getSessionUser } from "@/lib/auth";
 import { getSettings, notify, logActivity } from "@/lib/notify";
 import { emit, rooms } from "@/lib/emit";
 import { isOpenNow, DEFAULT_SETTINGS } from "@/lib/nyandak";
-import { sweep } from "@/lib/sweep";
+import { safeSweep } from "@/lib/sweep";
 
 async function requireAdmin() {
   return getSessionUser((await cookies()).get(cookieName())?.value);
@@ -14,7 +14,7 @@ async function requireAdmin() {
 export async function GET(req: NextRequest) {
   const me = await requireAdmin();
   if (!me || me.role !== "ADMIN") return NextResponse.json({ error: "Khusus admin." }, { status: 403 });
-  await sweep();
+  await safeSweep();
 
   const view = new URL(req.url).searchParams.get("view") || "overview";
 

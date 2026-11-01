@@ -8,7 +8,7 @@ import {
 } from "@/lib/nyandak";
 import { getSettings, notify, logActivity } from "@/lib/notify";
 import { emit, rooms } from "@/lib/emit";
-import { sweep, serializeOrderLite } from "@/lib/sweep";
+import { safeSweep, serializeOrderLite } from "@/lib/sweep";
 
 async function me() {
   const jar = await cookies();
@@ -25,7 +25,7 @@ const ORDER_INCLUDE = {
 export async function GET(req: NextRequest) {
   const user = await me();
   if (!user) return NextResponse.json({ error: "Login dulu." }, { status: 401 });
-  await sweep();
+  await safeSweep();
 
   const url = new URL(req.url);
   const scope = url.searchParams.get("scope") || "all";

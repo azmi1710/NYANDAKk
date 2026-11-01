@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<style>
+  @font-face { font-family:'PJS'; src:url('fonts/PJS-400.ttf'); font-weight:400; }
+  @font-face { font-family:'PJS'; src:url('fonts/PJS-500.ttf'); font-weight:500; }
+  @font-face { font-family:'PJS'; src:url('fonts/PJS-600.ttf'); font-weight:600; }
+  @font-face { font-family:'PJS'; src:url('fonts/PJS-700.ttf'); font-weight:700; }
+  @font-face { font-family:'PJS'; src:url('fonts/PJS-800.ttf'); font-weight:800; }
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'PJS','DejaVu Sans',sans-serif; }
+  body { width:1420px; background:#EFE6D8; padding:36px 40px 42px; }
+  .shot-label { font-size:15px; font-weight:800; color:#8F3E1E; letter-spacing:.4px; margin:0 0 14px 4px; text-transform:uppercase; }
+  .screen { width:1340px; height:840px; background:#FDF6EC; border-radius:26px; border:11px solid #33241C; overflow:hidden; box-shadow:0 18px 40px rgba(51,36,28,.28); display:flex; }
+  .side { width:236px; background:#33241C; color:#FDF6EC; padding:26px 18px; display:flex; flex-direction:column; }
+  .logo { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .logo b { font-size:19px; font-weight:800; letter-spacing:1px; color:#FDF6EC; }
+  .logo span { font-size:8.5px; opacity:.6; display:block; letter-spacing:.5px; }
+  .duck { position:relative; width:36px; height:36px; background:#F2C94C; border-radius:50% 50% 46% 46%; }
+  .duck::before { content:''; position:absolute; left:6px; top:14px; width:25px; height:19px; background:#FDF6EC; border-radius:50%; }
+  .duck::after { content:''; position:absolute; right:-4px; top:15px; width:0; height:0; border-left:10px solid #C75B2B; border-top:6px solid transparent; border-bottom:6px solid transparent; }
+  .duck .eye { position:absolute; left:19px; top:7px; width:5px; height:5px; background:#33241C; border-radius:50%; }
+  .menu { margin-top:26px; display:flex; flex-direction:column; gap:6px; }
+  .mi { padding:11px 14px; border-radius:12px; font-size:12.5px; font-weight:600; opacity:.75; }
+  .mi.on { background:#C75B2B; opacity:1; font-weight:800; }
+  .side .foot { margin-top:auto; font-size:9.5px; opacity:.5; line-height:1.5; }
+  .main { flex:1; padding:24px 30px; overflow:hidden; }
+  .top { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
+  .top h1 { font-size:21px; font-weight:800; color:#33241C; }
+  .top .sub { font-size:11.5px; color:#8A7A70; font-weight:600; margin-top:2px; }
+  .adminchip { display:flex; align-items:center; gap:9px; background:#fff; padding:7px 13px; border-radius:99px; font-size:11.5px; font-weight:700; color:#33241C; box-shadow:0 4px 12px rgba(51,36,28,.08); }
+  .kpi { display:flex; gap:14px; margin-bottom:18px; }
+  .kcard { flex:1; background:#fff; border-radius:18px; padding:15px 17px; box-shadow:0 4px 14px rgba(51,36,28,.07); }
+  .kcard span { font-size:10px; font-weight:800; color:#8A7A70; text-transform:uppercase; letter-spacing:.5px; }
+  .kcard b { display:block; font-size:24px; font-weight:800; color:#33241C; margin-top:4px; }
+  .kcard small { font-size:10px; font-weight:700; }
+  .k1 b { color:#C75B2B; } .k1 small { color:#3E7C4F; }
+  .k2 b { color:#3E7C4F; } .k3 b { color:#9A6A12; } .k4 b { color:#8F3E1E; }
+  .grid { display:flex; gap:14px; }
+  .panel { background:#fff; border-radius:18px; box-shadow:0 4px 14px rgba(51,36,28,.07); padding:16px 18px; }
+  .ptitle { font-size:13px; font-weight:800; color:#33241C; margin-bottom:12px; display:flex; justify-content:space-between; align-items:baseline; }
+  .ptitle span { font-size:10px; color:#8A7A70; font-weight:700; }
+  table { width:100%; border-collapse:collapse; font-size:11px; }
+  th { text-align:left; color:#8A7A70; font-size:9.5px; text-transform:uppercase; letter-spacing:.5px; padding:6px 8px; border-bottom:2px solid #EFE0CE; }
+  td { padding:8.5px 8px; border-bottom:1.5px solid #F7EFE2; color:#33241C; font-weight:600; }
+  tr:last-child td { border-bottom:none; }
+  .badge { font-size:9px; font-weight:800; padding:3.5px 10px; border-radius:99px; white-space:nowrap; }
+  .s1 { background:#FBE9C6; color:#9A6A12; } .s2 { background:#F7DFC8; color:#8F3E1E; }
+  .s3 { background:#DDEBDD; color:#3E7C4F; } .s4 { background:#F3E3E0; color:#8F3E1E; }
+  .zbadge { font-size:8.5px; font-weight:800; padding:2.5px 8px; border-radius:99px; }
+  .za { background:#F7DFC8; color:#8F3E1E; } .zb { background:#FBE9C6; color:#9A6A12; } .zc { background:#DDEBDD; color:#3E7C4F; }
+  .left-panel { width:490px; flex-shrink:0; }
+  .krow { display:flex; align-items:center; gap:11px; padding:9px 0; border-bottom:1.5px solid #F7EFE2; }
+  .krow:last-child { border-bottom:none; }
+  .kavatar { width:34px; height:34px; border-radius:12px; background:#F3E7D5; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-weight:800; color:#8F3E1E; font-size:13px; }
+  .kinfo { flex:1; } .kinfo b { font-size:12px; color:#33241C; display:block; } .kinfo span { font-size:10px; color:#8A7A70; font-weight:600; }
+  .btns { display:flex; gap:6px; }
+  .ok { background:#3E7C4F; color:#fff; font-size:10px; font-weight:800; padding:7px 13px; border-radius:99px; }
+  .no { background:#fff; border:2px solid #EFE0CE; color:#8F3E1E; font-size:10px; font-weight:800; padding:5px 13px; border-radius:99px; }
+</style>
+</head>
+<body>
+<div class="shot-label">Panel Admin &middot; Dashboard (Tampilan Desktop)</div>
+<div class="screen">
+  <div class="side">
+    <div class="logo">
+      <div class="duck"><span class="eye"></span></div>
+      <div><b>NYANDAK</b><span>PANEL ADMIN &middot; SIRAMPOG</span></div>
+    </div>
+    <div class="menu">
+      <div class="mi on">Dashboard</div>
+      <div class="mi">Semua Order</div>
+      <div class="mi">Kurir &amp; Verifikasi</div>
+      <div class="mi">Pengguna</div>
+      <div class="mi">Zona &amp; Tarif</div>
+      <div class="mi">Rekap Harian</div>
+    </div>
+    <div class="foot">Mode MVP &middot; biaya infrastruktur Rp0<br>Supabase Free &middot; Vercel Free</div>
+  </div>
+  <div class="main">
+    <div class="top">
+      <div><h1>Dashboard Operasional</h1><div class="sub">Minggu, 1 November 2026 &middot; data real-time</div></div>
+      <div class="adminchip">Mas Pak RT &middot; Admin</div>
+    </div>
+    <div class="kpi">
+      <div class="kcard k1"><span>Order hari ini</span><b>23</b><small>+4 dari kemarin</small></div>
+      <div class="kcard k2"><span>Kurir online</span><b>7</b><small>dari 12 kurir terverifikasi</small></div>
+      <div class="kcard k3"><span>Ongkir terkumpul</span><b>Rp 184.000</b><small>COD tercatat otomatis</small></div>
+      <div class="kcard k4"><span>Perlu mediasi</span><b>1</b><small>order #0138 &middot; barang bocor</small></div>
+    </div>
+    <div class="grid">
+      <div class="panel" style="flex:1">
+        <div class="ptitle">Order Terbaru <span>6 dari 23</span></div>
+        <table>
+          <tr><th>ID</th><th>Jenis</th><th>Rute</th><th>Kurir</th><th>Status</th><th>Ongkir</th></tr>
+          <tr><td>#0144</td><td>Antar</td><td>B &#8594; A</td><td>Rusdi</td><td><span class="badge s1">DIANTAR</span></td><td>8.000</td></tr>
+          <tr><td>#0143</td><td>Beliin</td><td>A &#8594; B</td><td>&mdash;</td><td><span class="badge s4">MENUNGGU</span></td><td>8.000</td></tr>
+          <tr><td>#0142</td><td>Beliin</td><td>A &#8594; B</td><td>Rusdi</td><td><span class="badge s2">DIPROSES</span></td><td>8.000</td></tr>
+          <tr><td>#0141</td><td>Lainnya</td><td>A &#8594; A</td><td>Sopie</td><td><span class="badge s3">SELESAI</span></td><td>5.000</td></tr>
+          <tr><td>#0140</td><td>Antar</td><td>B &#8594; C</td><td>Wawan</td><td><span class="badge s3">SELESAI</span></td><td>15.000</td></tr>
+          <tr><td>#0139</td><td>Beliin</td><td>C &#8594; A</td><td>Sopie</td><td><span class="badge s3">SELESAI</span></td><td>15.000</td></tr>
+        </table>
+      </div>
+      <div class="panel left-panel">
+        <div class="ptitle">Verifikasi Kurir Baru <span>2 menunggu</span></div>
+        <div class="krow">
+          <div class="kavatar">T</div>
+          <div class="kinfo"><b>Tamin &middot; 0812-3456-78xx</b><span>Domisili: Dawuhan &middot; KTP terunggah &middot; motor pribadi</span></div>
+          <div class="btns"><span class="ok">Terima</span><span class="no">Tolak</span></div>
+        </div>
+        <div class="krow">
+          <div class="kavatar">N</div>
+          <div class="kinfo"><b>Nurhayati &middot; 0857-1234-56xx</b><span>Domisili: Plompong &middot; KTP terunggah &middot; sepeda motor</span></div>
+          <div class="btns"><span class="ok">Terima</span><span class="no">Tolak</span></div>
+        </div>
+        <div class="ptitle" style="margin-top:16px">Zona &amp; Tarif Aktif <span>aturan flat</span></div>
+        <table>
+          <tr><th>Zona</th><th>Cakupan</th><th>Tarif</th><th>SLA</th></tr>
+          <tr><td><span class="zbadge za">A</span></td><td>Mendala, Buniwah, Kaligiri, Manggis</td><td>Rp 5.000</td><td>&le;30 mnt</td></tr>
+          <tr><td><span class="zbadge zb">B</span></td><td>9 desa lainnya Kec. Sirampog</td><td>Rp 8.000</td><td>&le;60 mnt</td></tr>
+          <tr><td><span class="zbadge zc">C</span></td><td>Luar kecamatan (Tonjong, Paguyangan, Bumiayu)</td><td>Rp 15.000</td><td>&le;2 jam</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<style>
+  @font-face { font-family:'PJS'; src:url('fonts/PJS-400.ttf'); font-weight:400; }
+  @font-face { font-family:'PJS'; src:url('fonts/PJS-500.ttf'); font-weight:500; }
+  @font-face { font-family:'PJS'; src:url('fonts/PJS-600.ttf'); font-weight:600; }
+  @font-face { font-family:'PJS'; src:url('fonts/PJS-700.ttf'); font-weight:700; }
+  @font-face { font-family:'PJS'; src:url('fonts/PJS-800.ttf'); font-weight:800; }
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'PJS','DejaVu Sans',sans-serif; }
+  body { width:1270px; background:#EFE6D8; padding:36px 40px 44px; }
+  .row { display:flex; gap:46px; justify-content:center; }
+  .shot { display:flex; flex-direction:column; align-items:center; }
+  .shot-label { font-size:15px; font-weight:800; color:#8F3E1E; letter-spacing:.4px; margin-bottom:14px; text-transform:uppercase; }
+  .phone { width:350px; height:742px; background:#FDF6EC; border-radius:42px; border:11px solid #33241C; overflow:hidden; position:relative; box-shadow:0 18px 40px rgba(51,36,28,.28); }
+  .statusbar { height:34px; display:flex; align-items:center; justify-content:space-between; padding:0 20px; font-size:11.5px; font-weight:700; color:#33241C; background:transparent; }
+  .sig { display:flex; gap:4px; align-items:center; }
+  .sig i { width:13px; height:8px; background:#33241C; border-radius:2px; display:block; opacity:.85; }
+  .sig i:nth-child(2){ opacity:.55 } .sig i:nth-child(3){ opacity:.3 }
+
+  /* --- duck mascot --- */
+  .duck { position:relative; width:38px; height:38px; background:#F2C94C; border-radius:50% 50% 46% 46%; }
+  .duck::before { content:''; position:absolute; left:6px; top:14px; width:26px; height:20px; background:#FDF6EC; border-radius:50%; }
+  .duck::after { content:''; position:absolute; right:-4px; top:15px; width:0; height:0; border-left:10px solid #C75B2B; border-top:6px solid transparent; border-bottom:6px solid transparent; }
+  .duck .eye { position:absolute; left:20px; top:7px; width:5px; height:5px; background:#33241C; border-radius:50%; }
+
+  .hd { padding:10px 20px 6px; display:flex; justify-content:space-between; align-items:center; }
+  .hd h2 { font-size:20px; font-weight:800; color:#33241C; line-height:1.15; }
+  .hd .sub { font-size:12px; color:#8A7A70; font-weight:600; margin-top:2px; }
+
+  .svc { display:flex; gap:12px; padding:10px 20px 4px; }
+  .svc-card { flex:1; border-radius:20px; padding:14px 10px 12px; color:#fff; text-align:center; }
+  .svc-card .ic { width:34px; height:34px; margin:0 auto 8px; border-radius:12px; background:rgba(255,255,255,.25); position:relative; }
+  .svc-card b { font-size:13px; font-weight:800; display:block; }
+  .svc-card span { font-size:10px; opacity:.92; font-weight:500; display:block; margin-top:2px; }
+  .c1 { background:#C75B2B; } .c2 { background:#F2A93B; } .c3 { background:#3E7C4F; }
+  .ic-bag::after { content:''; position:absolute; left:8px; top:9px; width:16px; height:13px; border:2.5px solid #fff; border-radius:3px 3px 6px 6px; }
+  .ic-bag::before { content:''; position:absolute; left:11px; top:5px; width:10px; height:8px; border:2.5px solid #fff; border-bottom:none; border-radius:6px 6px 0 0; }
+  .ic-moto::after { content:''; position:absolute; left:4px; top:14px; width:22px; height:9px; background:#fff; border-radius:5px 8px 2px 4px; }
+  .ic-moto::before { content:''; position:absolute; left:6px; top:6px; width:12px; height:9px; background:#fff; border-radius:3px; }
+  .ic-more::after { content:''; position:absolute; left:50%; top:50%; width:14px; height:14px; transform:translate(-50%,-50%); background:#fff; border-radius:4px; box-shadow:5px 5px 0 -1px rgba(255,255,255,.6); }
+
+  .zone { margin:12px 20px 0; background:#fff; border-radius:20px; padding:14px 16px; box-shadow:0 4px 14px rgba(51,36,28,.07); }
+  .zone h3 { font-size:13px; font-weight:800; color:#33241C; margin-bottom:9px; }
+  .zrow { display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-top:1.5px dashed #EFE0CE; font-size:11.5px; }
+  .zrow:first-of-type { border-top:none; }
+  .zbadge { font-size:9.5px; font-weight:800; padding:3px 9px; border-radius:99px; margin-right:8px; }
+  .za { background:#F7DFC8; color:#8F3E1E; } .zb { background:#FBE9C6; color:#9A6A12; } .zc { background:#DDEBDD; color:#3E7C4F; }
+  .zprice { font-weight:800; color:#33241C; }
+
+  .promo { margin:12px 20px 0; background:#33241C; border-radius:20px; padding:14px 16px; color:#FDF6EC; display:flex; align-items:center; gap:12px; }
+  .promo .duck { flex-shrink:0; }
+  .promo b { font-size:12.5px; display:block; }
+  .promo span { font-size:10.5px; opacity:.8; }
+
+  .nav { position:absolute; bottom:0; left:0; right:0; height:62px; background:#fff; border-top:1.5px solid #EFE0CE; display:flex; }
+  .nav div { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; font-size:9.5px; font-weight:700; color:#B7A995; }
+  .nav .on { color:#C75B2B; }
+  .nav i { width:20px; height:20px; border-radius:7px; background:currentColor; opacity:.85; display:block; }
+
+  .form { padding:6px 20px 0; }
+  .seg { display:flex; background:#F3E7D5; border-radius:14px; padding:4px; margin-bottom:12px; }
+  .seg span { flex:1; text-align:center; font-size:11px; font-weight:700; color:#8A7A70; padding:8px 0; border-radius:11px; }
+  .seg .sel { background:#C75B2B; color:#fff; box-shadow:0 3px 8px rgba(199,91,43,.35); }
+  .lbl { font-size:10.5px; font-weight:800; color:#8A7A70; text-transform:uppercase; letter-spacing:.5px; margin:10px 0 5px; }
+  .inp { background:#fff; border:2px solid #EFE0CE; border-radius:14px; padding:11px 13px; font-size:12px; color:#33241C; font-weight:600; display:flex; justify-content:space-between; align-items:center; }
+  .inp .ar { color:#C75B2B; font-weight:800; }
+  .inp.ph { color:#B7A995; font-weight:500; }
+  .tarifbox { margin:14px 20px 0; background:#FFF4E4; border:2px dashed #F2A93B; border-radius:16px; padding:12px 14px; display:flex; justify-content:space-between; align-items:center; }
+  .tarifbox b { font-size:17px; font-weight:800; color:#8F3E1E; }
+  .tarifbox span { font-size:10px; color:#9A6A12; font-weight:600; display:block; }
+  .cta { margin:14px 20px 0; background:#C75B2B; color:#fff; text-align:center; font-weight:800; font-size:13.5px; padding:14px; border-radius:99px; box-shadow:0 8px 18px rgba(199,91,43,.4); }
+
+  .tl { margin:10px 20px 0; background:#fff; border-radius:18px; padding:13px 15px; }
+  .step { display:flex; gap:10px; position:relative; padding-bottom:14px; }
+  .step:last-child { padding-bottom:2px; }
+  .dot { width:16px; height:16px; border-radius:50%; background:#EFE0CE; flex-shrink:0; position:relative; z-index:1; }
+  .step.done .dot { background:#3E7C4F; } .step.now .dot { background:#C75B2B; box-shadow:0 0 0 4px #F7DFC8; }
+  .step:not(:last-child)::before { content:''; position:absolute; left:7px; top:16px; bottom:-2px; width:2px; background:#EFE0CE; }
+  .step b { font-size:11.5px; font-weight:800; color:#B7A995; display:block; }
+  .step.done b { color:#3E7C4F; } .step.now b { color:#C75B2B; }
+  .step span { font-size:9.5px; color:#B7A995; font-weight:500; }
+
+  .kurir { margin:10px 20px 0; background:#fff; border-radius:18px; padding:12px 14px; display:flex; align-items:center; gap:11px; }
+  .kurir .nm { font-size:12.5px; font-weight:800; color:#33241C; }
+  .kurir .mt { font-size:10px; color:#8A7A70; font-weight:600; }
+  .star { margin-left:auto; font-size:11px; font-weight:800; color:#9A6A12; background:#FBE9C6; padding:4px 9px; border-radius:99px; }
+
+  .chat { padding:10px 20px 0; display:flex; flex-direction:column; gap:8px; }
+  .bub { max-width:75%; padding:9px 12px; border-radius:16px; font-size:11px; font-weight:500; line-height:1.4; }
+  .bub.me { align-self:flex-end; background:#C75B2B; color:#fff; border-bottom-right-radius:5px; }
+  .bub.them { align-self:flex-start; background:#fff; color:#33241C; border-bottom-left-radius:5px; box-shadow:0 3px 8px rgba(51,36,28,.06); }
+  .bub small { display:block; font-size:8px; opacity:.65; margin-top:3px; font-weight:600; }
+  .chatin { position:absolute; bottom:14px; left:20px; right:20px; background:#fff; border:2px solid #EFE0CE; border-radius:99px; padding:9px 14px; font-size:11px; color:#B7A995; display:flex; justify-content:space-between; }
+  .chatin b { color:#C75B2B; }
+</style>
+</head>
+<body>
+<div class="row">
+
+  <!-- ===== 1. BERANDA ===== -->
+  <div class="shot">
+    <div class="shot-label">1 · Beranda Customer</div>
+    <div class="phone">
+      <div class="statusbar"><span>09.41</span><div class="sig"><i></i><i></i><i></i></div></div>
+      <div class="hd">
+        <div><h2>Sore, Pak Dedi</h2><div class="sub">Dipesen apa hari ini?</div></div>
+        <div class="duck"><span class="eye"></span></div>
+      </div>
+      <div class="svc">
+        <div class="svc-card c1"><div class="ic ic-bag"></div><b>Beliin</b><span>suruh belanja</span></div>
+        <div class="svc-card c2"><div class="ic ic-moto"></div><b>Antarin</b><span>kirim barang</span></div>
+        <div class="svc-card c3"><div class="ic ic-more"></div><b>Lainnya</b><span>serah suruh</span></div>
+      </div>
+      <div class="zone">
+        <h3>Tarif Zona Sirampog</h3>
+        <div class="zrow"><span><i class="zbadge za">ZONA A</i>Mendala · Buniwah · Kaligiri · Manggis</span><span class="zprice">5rb</span></div>
+        <div class="zrow"><span><i class="zbadge zb">ZONA B</i>9 desa lainnya di Kec. Sirampog</span><span class="zprice">8rb</span></div>
+        <div class="zrow"><span><i class="zbadge zc">ZONA C</i>Luar kecamatan (Tonjong, Bumiayu, dst.)</span><span class="zprice">15rb</span></div>
+      </div>
+      <div class="promo">
+        <div class="duck"><span class="eye"></span></div>
+        <div><b>Mentok udah siap jalan!</b><span>7 kurir online di Zona A sekarang</span></div>
+      </div>
+      <div class="nav"><div class="on"><i></i>Beranda</div><div><i></i>Pesanan</div><div><i></i>Chat</div><div><i></i>Profil</div></div>
+    </div>
+  </div>
+
+  <!-- ===== 2. BIKIN ORDER ===== -->
+  <div class="shot">
+    <div class="shot-label">2 · Form Bikin Order</div>
+    <div class="phone">
+      <div class="statusbar"><span>09.41</span><div class="sig"><i></i><i></i><i></i></div></div>
+      <div class="hd"><div><h2>Bikin Order</h2><div class="sub">Ceritakan yang kamu butuhkan</div></div></div>
+      <div class="form">
+        <div class="seg"><span class="sel">Beliin</span><span>Antar</span><span>Lainnya</span></div>
+        <div class="lbl">Apa yang dibeliin?</div>
+        <div class="inp ph">Contoh: kangkung 2 ikat, tahu 5 potong&#8230;</div>
+        <div class="lbl">Dari zona / lokasi jemput</div>
+        <div class="inp">Zona A &middot; Pasar Sirampog, Mendala <span class="ar">&#9662;</span></div>
+        <div class="lbl">Ke zona / tujuan</div>
+        <div class="inp">Zona B &middot; Dusun Krajan, Sridadi <span class="ar">&#9662;</span></div>
+        <div class="lbl">Catatan untuk kurir</div>
+        <div class="inp ph">Sayurnya yang muda ya, Pak&#8230;</div>
+        <div class="lbl">Lampiran foto (opsional)</div>
+        <div class="inp">+ Ambil foto / dari galeri</div>
+      </div>
+      <div class="tarifbox">
+        <div><span>Ongkir jasa (flat, zona B)</span><b>Rp 8.000</b></div>
+        <div style="text-align:right"><span>Harga barang</span><b style="font-size:13px">COD</b></div>
+      </div>
+      <div class="cta">Kirim Order</div>
+    </div>
+  </div>
+
+  <!-- ===== 3. DETAIL + CHAT ===== -->
+  <div class="shot">
+    <div class="shot-label">3 · Detail Order &amp; Chat</div>
+    <div class="phone">
+      <div class="statusbar"><span>09.41</span><div class="sig"><i></i><i></i><i></i></div></div>
+      <div class="hd"><div><h2>Order #0142</h2><div class="sub">Beliin &middot; Zona A ke Zona B</div></div><span class="star" style="background:#F7DFC8;color:#8F3E1E">DIPROSES</span></div>
+      <div class="kurir">
+        <div class="duck"><span class="eye"></span></div>
+        <div><div class="nm">Rusdi</div><div class="mt">Honda Motor &middot; plat B 4821 KJ</div></div>
+        <span class="star">4.9</span>
+      </div>
+      <div class="tl">
+        <div class="step done"><div class="dot"></div><div><b>Order diterima</b><span>09.12 &middot; Rusdi mengambil order kamu</span></div></div>
+        <div class="step now"><div class="dot"></div><div><b>Sedang dibeliin</b><span>09.31 &middot; lagi di Pasar Sirampog</span></div></div>
+        <div class="step"><div class="dot"></div><div><b>Diantar</b><span>menuju Dusun Krajan, Sridadi</span></div></div>
+        <div class="step"><div class="dot"></div><div><b>Selesai</b><span>bayar COD di tempat</span></div></div>
+      </div>
+      <div class="chat">
+        <div class="bub me">Beliin kangkung 2 ikat sama tahu 5 potong ya Pak<small>09.32</small></div>
+        <div class="bub them">Siap Mas, udah di tengah pasar. Tahunya merek apa?<small>09.34</small></div>
+        <div class="bub me">Yang biasa aja Pak, makasih<small>09.35</small></div>
+      </div>
+      <div class="chatin">Tulis pesan&#8230; <b>Kirim &#9654;</b></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

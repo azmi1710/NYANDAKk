@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<style>
+  @font-face { font-family:'PJS'; src:url('fonts/PJS-400.ttf'); font-weight:400; }
+  @font-face { font-family:'PJS'; src:url('fonts/PJS-500.ttf'); font-weight:500; }
+  @font-face { font-family:'PJS'; src:url('fonts/PJS-600.ttf'); font-weight:600; }
+  @font-face { font-family:'PJS'; src:url('fonts/PJS-700.ttf'); font-weight:700; }
+  @font-face { font-family:'PJS'; src:url('fonts/PJS-800.ttf'); font-weight:800; }
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'PJS','DejaVu Sans',sans-serif; }
+  body { width:1420px; background:#FFFFFF; padding:34px 40px 36px; }
+  .legend { display:flex; gap:18px; align-items:center; margin:0 0 16px 2px; }
+  .legend .lg { display:flex; align-items:center; gap:7px; font-size:12px; font-weight:700; color:#6E6058; }
+  .sw { width:16px; height:16px; border-radius:6px; display:block; }
+  .flow { display:flex; align-items:stretch; }
+  .box { width:178px; border-radius:18px; padding:13px 14px 14px; display:flex; flex-direction:column; }
+  .bc { background:#FDF6EC; border:2.5px solid #C75B2B; }
+  .bk { background:#33241C; border:2.5px solid #33241C; }
+  .n { display:inline-flex; align-self:flex-start; font-size:10.5px; font-weight:800; padding:3px 11px; border-radius:99px; margin-bottom:8px; }
+  .bc .n { background:#C75B2B; color:#fff; }
+  .bk .n { background:#F2A93B; color:#33241C; }
+  .who { margin-left:auto; align-self:flex-start; font-size:9px; font-weight:800; letter-spacing:.5px; padding:3px 8px; border-radius:6px; }
+  .who.c { background:#F7DFC8; color:#8F3E1E; } .who.k { background:#4A3A30; color:#F2C94C; }
+  .box b { display:block; font-size:14.5px; font-weight:800; color:#33241C; margin-bottom:5px; line-height:1.2; }
+  .bk b { color:#FDF6EC; }
+  .box span { font-size:11px; color:#6E6058; font-weight:500; line-height:1.5; display:block; }
+  .bk span { color:#C9BBB0; }
+  .arw { width:33px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+  .arw i { display:block; width:0; height:0; border-left:12px solid #C75B2B; border-top:8px solid transparent; border-bottom:8px solid transparent; }
+  .note { margin-top:22px; background:#FFF4E4; border:2px dashed #F2A93B; border-radius:16px; padding:14px 18px; display:flex; gap:22px; align-items:center; }
+  .note div { font-size:11.5px; color:#6E6058; font-weight:600; line-height:1.55; }
+  .note b { color:#8F3E1E; font-weight:800; }
+  .pill { flex-shrink:0; background:#F2A93B; color:#33241C; font-size:11px; font-weight:800; padding:7px 14px; border-radius:99px; white-space:nowrap; }
+</style>
+</head>
+<body>
+
+  <div class="legend">
+    <span class="lg"><span class="sw" style="background:#FDF6EC;border:2.5px solid #C75B2B"></span>Langkah Customer</span>
+    <span class="lg"><span class="sw" style="background:#33241C"></span>Langkah Kurir</span>
+    <span class="lg"><span class="sw" style="background:#FFF4E4;border:2px dashed #F2A93B"></span>Aturan Kunci Bisnis</span>
+  </div>
+
+  <div class="flow">
+    <div class="box bc">
+      <div style="display:flex"><span class="n">1</span><span class="who c">CUSTOMER</span></div>
+      <b>Bikin order</b>
+      <span>Pilih layanan (Beliin / Antar / Lainnya), isi detail barang, zona asal &#8594; tujuan, foto bila perlu</span>
+    </div>
+    <div class="arw"><i></i></div>
+    <div class="box bc">
+      <div style="display:flex"><span class="n">2</span><span class="who c">CUSTOMER</span></div>
+      <b>Tarif otomatis</b>
+      <span>Sistem baca tabel zona &mdash; ongkir flat tampil sebelum order dikirim, tanpa tawar-menawar</span>
+    </div>
+    <div class="arw"><i></i></div>
+    <div class="box bk">
+      <div style="display:flex"><span class="n">3</span><span class="who k">KURIR</span></div>
+      <b>Ambil order</b>
+      <span>Order muncul di papan kurir online di zona itu &mdash; first-come-first-serve: tercepat klik AMBIL yang dapat</span>
+    </div>
+    <div class="arw"><i></i></div>
+    <div class="box bk">
+      <div style="display:flex"><span class="n">4</span><span class="who k">KURIR</span></div>
+      <b>Eksekusi + bukti</b>
+      <span>Status DIPROSES: belanja / jemput barang &mdash; wajib foto struk sebelum boleh DIANTAR</span>
+    </div>
+    <div class="arw"><i></i></div>
+    <div class="box bk">
+      <div style="display:flex"><span class="n">5</span><span class="who k">KURIR</span></div>
+      <b>Diantar</b>
+      <span>Status DIANTAR ke tujuan &mdash; customer &amp; admin melihat pergeseran status secara real-time</span>
+    </div>
+    <div class="arw"><i></i></div>
+    <div class="box bc">
+      <div style="display:flex"><span class="n">6</span><span class="who c">CUSTOMER</span></div>
+      <b>Bayar COD + rating</b>
+      <span>Bayar harga barang + ongkir di tempat &mdash; kurir tandai SELESAI, order masuk rekap, customer kasih rating 1&ndash;5</span>
+    </div>
+  </div>
+
+  <div class="note">
+    <span class="pill">ATURAN KUNCI</span>
+    <div><b>Chat aktif</b> sejak kurir mengambil (langkah 3) sampai order selesai (langkah 6) &nbsp;&middot;&nbsp; <b>Batal:</b> gratis sebelum langkah 3, Rp 5.000 setelahnya &nbsp;&middot;&nbsp; <b>Sengketa barang:</b> wajib foto bukti, diputuskan admin &nbsp;&middot;&nbsp; <b>Jam layanan:</b> 06.00&ndash;20.00 WIB &nbsp;&middot;&nbsp; <b>Ongkir</b> masuk kas kurir saat serah terima, harga barang utuh ke penjual</div>
+  </div>
+
+</body>
+</html>

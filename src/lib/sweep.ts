@@ -100,6 +100,16 @@ export async function sweep(): Promise<string[]> {
   return done;
 }
 
+// Pembungkus aman: sweep itu pekerjaan maintenance — kalau gagal,
+// JANGAN sampai bikin request utama (orders/admin) ikut error 500.
+export async function safeSweep(): Promise<void> {
+  try {
+    await sweep();
+  } catch (e) {
+    console.error("[sweep] gagal (diabaikan):", e);
+  }
+}
+
 function lastSundayDate(): Date {
   const d = new Date();
   const day = d.getDay(); // 0 = Minggu
