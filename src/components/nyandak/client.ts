@@ -29,7 +29,8 @@ function supaClient(): SupabaseClient | null {
 }
 
 // ── realtime: Supabase Broadcast, interface sama seperti socket.io (.on/.off) ──
-type Listener = (data: unknown) => void;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Listener = (data: any) => void;
 const REG = new Map<string, Set<Listener>>();
 const WRAP = new WeakMap<Listener, Listener>();
 let chan: RealtimeChannel | null = null;

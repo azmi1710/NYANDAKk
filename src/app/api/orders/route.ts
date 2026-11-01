@@ -45,15 +45,14 @@ export async function GET(req: NextRequest) {
       orderBy: { acceptedAt: "desc" },
       include: ORDER_INCLUDE,
     });
-    let board: unknown[] = [];
-    if (user.status === "ACTIVE") {
-      board = await db.order.findMany({
-        where: { status: "MENUNGGU_KURIR", statusDetail: null },
-        orderBy: { broadcastAt: "desc" },
-        take: 20,
-        include: { customer: { select: { name: true } } },
-      });
-    }
+    const board = user.status === "ACTIVE"
+      ? await db.order.findMany({
+          where: { status: "MENUNGGU_KURIR", statusDetail: null },
+          orderBy: { broadcastAt: "desc" },
+          take: 20,
+          include: { customer: { select: { name: true } } },
+        })
+      : [];
     const history = await db.order.findMany({
       where: { kurirId: user.id, status: { in: ["SELESAI", "DIBATALKAN"] } },
       orderBy: { completedAt: "desc" },
